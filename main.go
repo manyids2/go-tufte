@@ -1,17 +1,11 @@
+/*
+Copyright © 2023 NAME HERE <EMAIL ADDRESS>
+
+*/
 package main
 
-import (
-	"net/http"
-
-	"github.com/gin-gonic/gin"
-)
+import "github.com/manyids2/go-tufte/cmd"
 
 func main() {
-	router := gin.Default()
-	router.Static("/assets", "./assets")
-	router.LoadHTMLFiles("assets/index.html")
-	router.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.html", gin.H{})
-	})
-	router.Run(":8080")
+	cmd.Execute()
 }
