@@ -26,10 +26,10 @@ var serveCmd = &cobra.Command{
 		router.LoadHTMLFiles(htmldir + "/index.html")
 
 		router.GET("/", func(c *gin.Context) {
-			c.HTML(http.StatusOK, "index.html", gin.H{})
+			c.HTML(http.StatusOK, "index.html", gin.H{"datadir": datadir})
 		})
 
-		// router.Run(":8080")
+		router.Run(":8080")
 	},
 }
 
