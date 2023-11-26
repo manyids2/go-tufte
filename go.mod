@@ -4,6 +4,7 @@ go 1.21.3
 
 require (
 	github.com/gin-gonic/gin v1.9.1
+	github.com/manyids2/go-tree-sitter-with-markdown v1.0.0
 	github.com/spf13/cobra v1.7.0
 )
 
