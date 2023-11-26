@@ -20,6 +20,7 @@ func Execute() {
 }
 
 func init() {
+	rootCmd.PersistentFlags().StringP("path", "p", "./README.md", "Path to md file.")
 	rootCmd.PersistentFlags().StringP("datadir", "d", "~/notes", "Path to notes.")
 	rootCmd.PersistentFlags().StringP("htmldir", "s", "./assets", "Path to frontend.")
 }

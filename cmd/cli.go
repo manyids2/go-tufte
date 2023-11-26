@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"fmt"
+	"log"
 	"os"
 
 	sitter "github.com/manyids2/go-tree-sitter-with-markdown"
@@ -9,47 +9,36 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
-var path string
-
 // cliCmd represents the cli command
 var cliCmd = &cobra.Command{
 	Use:   "cli",
 	Short: "Cli",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
+		path, err := cmd.Flags().GetString("path")
+		if err != nil {
+			log.Fatalln("Please specify --path.")
+		}
+
 		// Create parser
 		parser := sitter.NewParser()
 		parser.SetLanguage(markdown.GetLanguage())
 
 		// Read file
 		dat, err := os.ReadFile(path)
-		check(err)
+		CheckErr(err)
 
 		// Parse source code
 		tree := parser.Parse(nil, dat)
 
-		// Query tree
+		// Root node
 		n := tree.RootNode()
 
-		// Print in treesitter format
-		// fmt.Println(n)
-
-		// Get children ( not nested )
-		for i := 0; i < int(n.NamedChildCount()); i++ {
-			child := n.NamedChild(i)
-			fmt.Println(child.Type(), child.StartByte(), child.EndByte())
-			fmt.Println(child.Content(dat))
-		}
+		// Walk tree and print ( we are actually calling here )
+		WalkWithIndent(n, 0, CallbackPrintNodeRange)
 	},
 }
 
 func init() {
-	cliCmd.PersistentFlags().StringVarP(&path, "path", "p", "./README.md", "Path to markdown file.")
 	rootCmd.AddCommand(cliCmd)
 }
