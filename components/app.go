@@ -1,9 +1,11 @@
 package components
 
 import (
-	"log"
+	"fmt"
+	"strings"
 
 	"github.com/gdamore/tcell/v2"
+	"github.com/manyids2/go-tufte/core"
 	"github.com/rivo/tview"
 )
 
@@ -18,6 +20,7 @@ const (
 // View of app
 type App struct {
 	// Necessities
+	Doc         *core.Document
 	Application *tview.Application
 	Pages       *tview.Pages
 	Page        string
@@ -29,10 +32,18 @@ type App struct {
 
 	// Modes for keeping track of toggle
 	Mode mode
+
+	// Keep track of focus
+	focusCycle   []*tview.TextView
+	focusCurrent int
+
+	// Keep track of sections
+	focusSection int
 }
 
-func NewApp() *App {
+func NewApp(doc *core.Document) *App {
 	app := App{
+		Doc:   doc,
 		Pages: tview.NewPages(),
 		Mode:  Normal,
 	}
@@ -40,72 +51,147 @@ func NewApp() *App {
 	// Create fullscreen app
 	app.Application = tview.NewApplication()
 
-	// Create home as default
-	app.Page = "home"
-	page := tview.NewGrid().SetRows(1, -1, 1).SetColumns(-1, -3)
-
-	// Content
-	app.Content = tview.NewTextView().
-		SetChangedFunc(func() {
-			app.Application.Draw()
-		})
-	app.Content.SetBorder(true)
-	page.AddItem(app.Content, 1, 1, 1, 1, 0, 0, true)
-
-	// Sidebar
-	app.Sidebar = tview.NewTextView().
-		SetChangedFunc(func() {
-			app.Application.Draw()
-		})
-	app.Sidebar.SetBorder(true)
-	page.AddItem(app.Sidebar, 1, 0, 1, 1, 0, 0, false)
-
-	// Sidebar
-	app.Statusbar = tview.NewTextView().
-		SetChangedFunc(func() {
-			app.Application.Draw()
-		})
-	page.AddItem(app.Statusbar, 2, 0, 1, 2, 0, 0, false)
-
-	// Home page
-	app.Pages.AddPage("home", page, true, true)
+	// Add home
+	app.AddHomePage()
 
 	// Set global keymaps
+	app.focusCycle = []*tview.TextView{app.Sidebar, app.Content}
 	app.SetKeymaps()
 
 	// Add it to page and display
-	app.Application.SetRoot(app.Pages, true).SetFocus(app.Content)
+	app.Application.SetRoot(app.Pages, true).SetFocus(app.Sidebar)
+
+	// Show info
+	app.SetStatusbar()
+
+	// Table of contents
+	app.SetSidebar()
+
+	// Try to print rendered string
+	app.SetContent()
 
 	return &app
+}
+
+func (a *App) SetContent() {
+	s := a.Doc.Sections[a.focusSection]
+	a.Content.Clear()
+	// TODO: Why cant I slice buffer??
+	content := string(*a.Doc.Buffer)[s.StartByte:s.EndByte]
+	fmt.Fprintf(a.Content, content)
+}
+
+func (a *App) SetStatusbar() {
+	a.Statusbar.Clear()
+	fmt.Fprintf(a.Statusbar, fmt.Sprintf("  %s > %s > %s", a.Doc.Path, a.Doc.Title, a.Doc.Sections[a.focusSection].Title))
+}
+
+func (a *App) SetSidebar() {
+	a.Sidebar.Clear()
+	for i, s := range a.Doc.Sections {
+		indent := strings.Repeat("  ", s.Level-1)
+		if i == a.focusSection {
+			fmt.Fprintf(a.Sidebar, fmt.Sprintf("|%s|> %s\n", indent, s.Title))
+		} else {
+			fmt.Fprintf(a.Sidebar, fmt.Sprintf(" %s   %s\n", indent, s.Title))
+		}
+	}
+}
+
+func (a *App) Update() {
+	a.SetStatusbar()
+	a.SetSidebar()
+	a.SetContent()
+}
+
+func (a *App) HandleSidebar(event *tcell.EventKey) *tcell.EventKey {
+	switch event.Key() {
+	case tcell.KeyDown:
+		a.focusSection = (a.focusSection + 1) % len(a.Doc.Sections)
+		a.Update()
+		return nil
+	case tcell.KeyUp:
+		a.focusSection = a.focusSection - 1
+		if a.focusSection < 0 {
+			a.focusSection = len(a.Doc.Sections) - 1
+		}
+		a.Update()
+		return nil
+	}
+	switch event.Rune() {
+	case 'j':
+		a.focusSection = (a.focusSection + 1) % len(a.Doc.Sections)
+		a.Update()
+		return nil
+	case 'k':
+		a.focusSection = a.focusSection - 1
+		if a.focusSection < 0 {
+			a.focusSection = len(a.Doc.Sections) - 1
+		}
+		a.Update()
+		return nil
+	}
+	return event
+}
+
+func (a *App) AddHomePage() {
+	// Create home as default
+	a.Page = "home"
+	page := tview.NewGrid().SetRows(1, -1, 1).SetColumns(-1, -2)
+
+	// Content
+	a.Content = tview.NewTextView().
+		SetChangedFunc(func() {
+			a.Application.Draw()
+		})
+	a.Content.SetBorder(true)
+	page.AddItem(a.Content, 1, 1, 1, 1, 0, 0, true)
+
+	// Sidebar
+	a.Sidebar = tview.NewTextView().
+		SetChangedFunc(func() {
+			a.Application.Draw()
+		})
+	a.Sidebar.SetBorder(true)
+	a.Sidebar.SetWrap(false)
+	page.AddItem(a.Sidebar, 1, 0, 1, 1, 0, 0, false)
+	a.Sidebar.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		return a.HandleSidebar(event)
+	})
+
+	// Statusbar
+	a.Statusbar = tview.NewTextView().
+		SetChangedFunc(func() {
+			a.Application.Draw()
+		})
+	page.AddItem(a.Statusbar, 2, 0, 1, 2, 0, 0, false)
+
+	// Home page
+	a.Pages.AddPage("home", page, true, true)
+}
+
+// ToggleFocus
+func (a *App) ToggleFocus() {
+	a.focusCurrent = (a.focusCurrent + 1) % len(a.focusCycle)
+	a.Application.SetFocus(a.focusCycle[a.focusCurrent])
 }
 
 // Quit, help, toggle
 func (a *App) SetKeymaps() {
 	a.Application.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Key() {
-		// Exit
 		case tcell.KeyEsc:
 			a.Application.Stop()
 			return nil
+		case tcell.KeyTab:
+			a.ToggleFocus()
+			return nil
 		}
-
 		switch event.Rune() {
-		// Basics
 		case 'q':
 			a.Application.Stop()
 			return nil
 		}
 		return event
 	})
-}
-
-func main() {
-	// Get path from args
-	app := NewApp()
-
-	// Run the application
-	err := app.Application.Run()
-	if err != nil {
-		log.Fatal(err)
-	}
 }

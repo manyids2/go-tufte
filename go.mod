@@ -3,6 +3,7 @@ module github.com/manyids2/go-tufte
 go 1.21.3
 
 require (
+	git.sr.ht/~rockorager/tcell-ansi v0.0.0-20230120023150-91d4320a30b5
 	github.com/charmbracelet/glamour v0.6.0
 	github.com/gdamore/tcell/v2 v2.6.0
 	github.com/gin-gonic/gin v1.9.1

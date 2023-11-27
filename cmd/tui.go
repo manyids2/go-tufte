@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/charmbracelet/glamour"
 	"github.com/manyids2/go-tufte/components"
 	"github.com/manyids2/go-tufte/core"
 	"github.com/spf13/cobra"
@@ -28,22 +27,9 @@ var tuiCmd = &cobra.Command{
 			fmt.Println("go-tufte:", err)
 			os.Exit(1)
 		}
-		// doc.PrintSections()
 
 		// Start app
-		app := components.NewApp()
-
-		// Try to print rendered string
-		content := string(*doc.Buffer)
-
-		// Try using glamour to rener
-		out, err := glamour.Render(content, "dark")
-
-		// Parse ansi using tview
-		// NOTE: Not working - why???
-		// w := tview.ANSIWriter(app.Content)
-		w := app.Content
-		fmt.Fprintf(w, out)
+		app := components.NewApp(doc)
 
 		// Run the application
 		err = app.Application.Run()

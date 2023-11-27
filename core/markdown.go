@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -76,6 +77,11 @@ func NewDocument(path string) (*Document, error) {
 
 	// Set Root with proper children
 	doc.SetRootFromSections()
+
+	// Set title to first found header
+	if len(doc.Root.Children) > 0 {
+		doc.Title = doc.Root.Children[0].Title
+	}
 
 	return &doc, nil
 }
@@ -204,11 +210,11 @@ func (n *Section) WalkWithIndent(indent int, callback func(n *Section, indent in
 }
 
 // Print to stdout
-func (d *Document) PrintSections() {
+func (d *Document) PrintSections(w io.Writer) {
 	d.Root.WalkWithIndent(0, func(n *Section, indent int) {
 		s := strings.Repeat(" ", indent)
-		fmt.Printf("%s%s ", s, n.Title)
-		fmt.Printf(
+		fmt.Fprintf(w, "%s%s ", s, n.Title)
+		fmt.Fprintf(w,
 			"|> %d [%d, %d] (%d, %d)\n",
 			n.Level,
 			n.StartRow, n.EndRow,

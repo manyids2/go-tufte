@@ -17,7 +17,7 @@ func PrintToC(path string) {
 		os.Exit(1)
 	}
 
-	doc.PrintSections()
+	doc.PrintSections(os.Stdout)
 }
 
 // tocCmd represents the toc command

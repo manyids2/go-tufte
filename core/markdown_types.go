@@ -4,7 +4,7 @@
 //	   grep '^    "type"' |\
 //	   cut -d':' -f2 |\
 //	   cut -d',' -f1 |\
-//	   xargs -I{} echo {} > core/mardown_types.go
+//	   xargs -I{} echo {} > core/markdown_types.go
 //
 // -- Root --
 // document
