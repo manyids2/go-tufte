@@ -225,14 +225,3 @@ type Content struct {
 	StartRow, EndRow   uint32
 	Parent             *Section
 }
-
-// Print table of contents to stdout
-func PrintToC(path string) {
-	doc, err := NewDocument(path)
-	if err != nil {
-		fmt.Println("go-tufte:", err)
-		os.Exit(1)
-	}
-
-	doc.PrintSections()
-}
