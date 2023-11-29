@@ -1,0 +1,92 @@
+[
+  {
+    "type": "text",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "thematic_break",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "atx_h1_marker",
+    "named": true
+  },
+  {
+    "type": "atx_h2_marker",
+    "named": true
+  },
+  {
+    "type": "atx_h3_marker",
+    "named": true
+  },
+  {
+    "type": "atx_h4_marker",
+    "named": true
+  },
+  {
+    "type": "atx_h5_marker",
+    "named": true
+  },
+  {
+    "type": "atx_h6_marker",
+    "named": true
+  },
+  {
+    "type": "backslash_escape",
+    "named": true
+  },
+  {
+    "type": "character_reference",
+    "named": true
+  },
+  {
+    "type": "hard_line_break",
+    "named": true
+  },
+  {
+    "type": "html_attribute_key",
+    "named": true
+  },
+  {
+    "type": "html_declaration_name",
+    "named": true
+  },
+  {
+    "type": "html_tag_name",
+    "named": true
+  },
+  {
+    "type": "line_break",
+    "named": true
+  },
+  {
+    "type": "list_marker",
+    "named": true
+  },
+  {
+    "type": "setext_h1_underline",
+    "named": true
+  },
+  {
+    "type": "setext_h2_underline",
+    "named": true
+  },
+  {
+    "type": "soft_line_break",
+    "named": true
+  },
+  {
+    "type": "table_column_alignment",
+    "named": true
+  },
+  {
+    "type": "task_list_item_marker",
+    "named": true
+  },
+  {
+    "type": "virtual_space",
+    "named": true
+  }
+]
