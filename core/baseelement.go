@@ -1,12 +1,9 @@
 package core
 
 import (
-	"bytes"
-	"io"
 	"strings"
-	"text/template"
 
-	"github.com/muesli/termenv"
+	"github.com/gdamore/tcell/v2"
 )
 
 // BaseElement renders a styled primitive element.
@@ -17,98 +14,47 @@ type BaseElement struct {
 	Style  StylePrimitive
 }
 
-func formatToken(format string, token string) (string, error) {
-	var b bytes.Buffer
-
-	v := make(map[string]interface{})
-	v["text"] = token
-
-	tmpl, err := template.New(format).Funcs(TemplateFuncMap).Parse(format)
-	if err != nil {
-		return "", err
-	}
-
-	err = tmpl.Execute(&b, v)
-	return b.String(), err
-}
-
-func renderText(w io.Writer, p termenv.Profile, rules StylePrimitive, s string) {
-	if len(s) == 0 {
-		return
-	}
-
-	out := termenv.String(s)
-
-	if rules.Upper != nil && *rules.Upper {
-		out = termenv.String(strings.ToUpper(s))
-	}
-	if rules.Lower != nil && *rules.Lower {
-		out = termenv.String(strings.ToLower(s))
-	}
-	if rules.Title != nil && *rules.Title {
-		out = termenv.String(strings.Title(s))
-	}
+func GetStyle(rules StylePrimitive) tcell.Style {
+	style := tcell.StyleDefault
 	if rules.Color != nil {
-		out = out.Foreground(p.Color(*rules.Color))
+		style.Foreground(tcell.GetColor(*rules.Color))
 	}
 	if rules.BackgroundColor != nil {
-		out = out.Background(p.Color(*rules.BackgroundColor))
+		style.Background(tcell.GetColor(*rules.BackgroundColor))
 	}
 	if rules.Underline != nil && *rules.Underline {
-		out = out.Underline()
+		style.Underline(true)
 	}
 	if rules.Bold != nil && *rules.Bold {
-		out = out.Bold()
+		style.Bold(true)
 	}
 	if rules.Italic != nil && *rules.Italic {
-		out = out.Italic()
+		style.Italic(true)
 	}
 	if rules.CrossedOut != nil && *rules.CrossedOut {
-		out = out.CrossOut()
+		style.StrikeThrough(true)
 	}
 	if rules.Overlined != nil && *rules.Overlined {
-		out = out.Overline()
+		// No implementation in tcell
 	}
 	if rules.Inverse != nil && *rules.Inverse {
-		out = out.Reverse()
+		style.Reverse(true)
 	}
 	if rules.Blink != nil && *rules.Blink {
-		out = out.Blink()
+		style.Blink(true)
 	}
-
-	_, _ = w.Write([]byte(out.String()))
+	return style
 }
 
-// func (e *BaseElement) Render(w io.Writer, ctx RenderContext) error {
-func (e *BaseElement) Render(w io.Writer, ctx RenderContext) error {
-	bs := ctx.blockStack
-
-	renderText(w, ctx.options.ColorProfile, bs.Current().Style.StylePrimitive, e.Prefix)
-	defer func() {
-		renderText(w, ctx.options.ColorProfile, bs.Current().Style.StylePrimitive, e.Suffix)
-	}()
-
-	rules := bs.With(e.Style)
-	// render unstyled prefix/suffix
-	renderText(w, ctx.options.ColorProfile, bs.Current().Style.StylePrimitive, rules.BlockPrefix)
-	defer func() {
-		renderText(w, ctx.options.ColorProfile, bs.Current().Style.StylePrimitive, rules.BlockSuffix)
-	}()
-
-	// render styled prefix/suffix
-	renderText(w, ctx.options.ColorProfile, rules, rules.Prefix)
-	defer func() {
-		renderText(w, ctx.options.ColorProfile, rules, rules.Suffix)
-	}()
-
-	s := e.Token
-	if len(rules.Format) > 0 {
-		var err error
-		s, err = formatToken(rules.Format, s)
-		if err != nil {
-			return err
-		}
+func GetDecoration(rules StylePrimitive, s string) string {
+	if rules.Upper != nil && *rules.Upper {
+		s = strings.ToUpper(s)
 	}
-	renderText(w, ctx.options.ColorProfile, rules, s)
-	return nil
+	if rules.Lower != nil && *rules.Lower {
+		s = strings.ToLower(s)
+	}
+	if rules.Title != nil && *rules.Title {
+		s = strings.Title(s)
+	}
+	return s
 }
