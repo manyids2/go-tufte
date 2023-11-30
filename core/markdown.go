@@ -148,6 +148,10 @@ func (d *Document) SetSections() {
 		}
 	}
 
+	if len(sections) < 1 {
+		return
+	}
+
 	// Reiterate to set end rows
 	for i := 0; i < len(sections)-1; i++ {
 		sections[i].EndRow = sections[i+1].StartRow - 1

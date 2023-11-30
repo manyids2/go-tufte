@@ -1,0 +1,15 @@
+-- local augroup = vim.api.nvim_create_augroup   -- Create/get autocommand group
+-- local autocmd = vim.api.nvim_create_autocmd   -- Create autocommand
+--
+-- -- Set indentation to 2 spaces
+-- augroup('setColorscheme', { clear = true })
+-- autocmd('Filetype', {
+--   group = 'setColorscheme',
+--   pattern = { 'md', 'markdown' },
+--   command = 'colorscheme habamax'
+-- })
+-- autocmd('Filetype', {
+--   group = 'setColorscheme',
+--   pattern = { 'go' },
+--   command = 'colorscheme phoenix'
+-- })

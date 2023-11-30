@@ -101,7 +101,12 @@ func callReadFunc(id C.int, byteIndex C.uint32_t, position C.TSPoint, byt
 esRead *C.uint32_t) *C.char
 ```
 
-## Primitives
+## Node types
+
+- `named` is always `true`
+- `fields` is always `{}`
+
+### Primitives
 
 Choose nodes that do not have children, put them into json
 
@@ -121,7 +126,7 @@ sed '$ s/.$//' -i node-types-primitives.json
 echo ']' >> node-types-primitives.json
 ```
 
-## Elements
+### Elements
 
 ```bash
 # Start json
@@ -139,4 +144,286 @@ sed '$ s/.$//' -i node-types-elements.json
 echo ']' >> node-types-elements.json
 ```
 
-## Blocks
+### Blocks
+
+Parse elements to find blocks
+
+```bash
+jq '.[] | { "name": .type, "types": .children.types } ' \
+        node-types-elements.json |\
+
+# Get only names and types
+grep -Ei '"name"|"type"' |\
+
+# Clean up quotes and comma
+sed 's/"/ /g' |\
+sed 's/,//g' |\
+
+# Dont need labels
+sed 's/name ://' |\
+sed 's/type ://' |\
+
+# Correction for indent
+sed 's/^    /-/' |\
+sed 's/^-    /  -/' >> TREESITTER.md
+```
+
+Types of content
+
+- General content ⋯                                                                                                                                           
+- Document ⋯                                                                                                                                                  
+- Styles ⋯                                                                                                                                                    
+- Headings ⋯                                                                                                                                                  
+- Paragraph ⋯                                                                                                                                                 
+- Epigraph ⋯                                                                                                                                                  
+- Code ⋯                                                                                                                                                      
+- Links ⋯                                                                                                                                                     
+- Lists ⋯                                                                                                                                                     
+- Table ⋯                                                                                                                                                     
+- HTML ⋯                                                                                                                                                      
+- Images ⋯       
+
+#### General content
+
+- html_content
+  - html_cdata_section
+  - html_close_tag
+  - html_comment
+  - html_declaration
+  - html_open_tag
+  - html_processing_instruction
+  - html_self_closing_tag
+- general_content
+  - backslash_escape
+  - character_reference
+  - code_span
+  - email_autolink
+  - emphasis
+  - hard_line_break
+  - html_content
+  - image
+  - link
+  - soft_line_break
+  - strikethrough
+  - strong_emphasis
+  - text
+  - uri_autolink
+  - www_autolink
+- restricted_content
+  - atx_heading
+  - block_quote
+  - fenced_code_block
+  - html_block
+  - indented_code_block
+  - link_reference_definition
+  - loose_list
+  - paragraph
+  - setext_heading
+  - table
+  - thematic_break
+  - tight_list
+
+#### Document
+
+- document
+  - restricted_content
+
+#### Styles
+
+- emphasis
+  - general_content
+- strikethrough
+  - general_content
+- strong_emphasis
+  - general_content
+
+#### Headings
+
+- setext_heading
+  - heading_content
+  - setext_h1_underline
+  - setext_h2_underline
+- atx_heading
+  - atx_h1_marker
+  - atx_h2_marker
+  - atx_h3_marker
+  - atx_h4_marker
+  - atx_h5_marker
+  - atx_h6_marker
+  - heading_content
+- heading_content
+  - general_content
+
+#### Paragraph
+
+- paragraph
+  - general_content
+  - task_list_item_marker
+
+#### Epigraph
+
+- block_quote
+  - restricted_content
+
+#### Code
+
+- code_fence_content
+  - line_break
+  - text
+  - virtual_space
+- code_span
+  - backslash_escape
+  - text
+- fenced_code_block
+  - code_fence_content
+  - info_string
+- indented_code_block
+  - line_break
+  - text
+  - virtual_space
+- info_string
+  - backslash_escape
+  - character_reference
+  - text
+
+#### Links
+
+- link
+  - link_title
+  - link_text
+  - link_label
+  - link_destination
+- link_title
+  - backslash_escape
+  - character_reference
+  - text
+- link_label
+  - backslash_escape
+  - text
+- link_text
+  - general_content
+- link_destination
+  - backslash_escape
+  - character_reference
+  - text
+- link_reference_definition
+  - link_destination
+  - link_label
+  - link_title
+- email_autolink
+  - backslash_escape
+  - text
+- uri_autolink
+  - backslash_escape
+  - text
+- www_autolink
+  - backslash_escape
+  - text
+
+#### Lists
+
+- tight_list
+  - list_item
+  - task_list_item
+- loose_list
+  - list_item
+  - task_list_item
+- list_item
+  - atx_heading
+  - block_quote
+  - fenced_code_block
+  - html_block
+  - indented_code_block
+  - link_reference_definition
+  - list_marker
+  - loose_list
+  - paragraph
+  - setext_heading
+  - table
+  - thematic_break
+  - tight_list
+- task_list_item
+  - atx_heading
+  - block_quote
+  - fenced_code_block
+  - html_block
+  - indented_code_block
+  - link_reference_definition
+  - list_marker
+  - loose_list
+  - paragraph
+  - setext_heading
+  - table
+  - thematic_break
+  - tight_list
+
+#### Table
+
+- table
+  - table_data_row
+  - table_delimiter_row
+  - table_header_row
+- table_cell
+  - backslash_escape
+  - character_reference
+  - code_span
+  - email_autolink
+  - emphasis
+  - html_content
+  - image
+  - link
+  - strikethrough
+  - strong_emphasis
+  - text
+  - uri_autolink
+  - www_autolink
+- table_data_row
+  - table_cell
+- table_delimiter_row
+  - table_column_alignment
+- table_header_row
+  - table_cell
+
+#### HTML
+
+- html_atrribute
+  - html_attribute_key
+  - html_attribute_value
+- html_attribute_value
+  - backslash_escape
+  - text
+- html_block
+  - line_break
+  - text
+  - virtual_space
+- html_cdata_section
+  - backslash_escape
+  - text
+- html_close_tag
+  - html_tag_name
+- html_comment
+  - backslash_escape
+  - text
+- html_declaration
+  - backslash_escape
+  - html_declaration_name
+  - text
+- html_open_tag
+  - html_atrribute
+  - html_tag_name
+- html_processing_instruction
+  - backslash_escape
+  - text
+- html_self_closing_tag
+  - html_atrribute
+  - html_tag_name
+
+#### Images
+
+- image
+  - image_description
+  - link_destination
+  - link_label
+  - link_title
+- image_description
+  - general_content

@@ -5,14 +5,12 @@ go 1.21.3
 require (
 	github.com/gdamore/tcell/v2 v2.6.0
 	github.com/gin-gonic/gin v1.9.1
-	github.com/manyids2/go-tree-sitter-with-markdown v1.0.0
-	github.com/muesli/termenv v0.13.0
+	github.com/manyids2/go-tree-sitter-with-markdown v1.0.1-0.20231130141122-0a158dec51bc
 	github.com/rivo/tview v0.0.0-20231126152417-33a1d271f2b6
 	github.com/spf13/cobra v1.7.0
 )
 
 require (
-	github.com/aymanbagabas/go-osc52 v1.0.3 // indirect
 	github.com/bytedance/sonic v1.9.1 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect

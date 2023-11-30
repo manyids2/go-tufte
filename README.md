@@ -26,6 +26,11 @@ Basics of build script
 - done [fork of go-tree-sitter](github.com/manyids2/go-tree-sitter-with-markdown)
 - can output children of any markdown file now.
 
+- Need to switch to [MDeiml implementation](https://github.com/MDeiml/tree-sitter-markdown/tree/split_parser)
+  - !! `split_parser` branch
+  - `tree-sitter-markdown`
+  - `tree-sitter-markdown-inline`
+
 ### Roadmap
 
 - [x] use go-tree-sitter for markdown

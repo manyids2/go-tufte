@@ -74,16 +74,22 @@ func NewApp(doc *core.Document) *App {
 }
 
 func (a *App) SetContent() {
-	s := a.Doc.Sections[a.focusSection]
-	a.Content.Clear()
-	// TODO: Why cant I slice buffer??
-	content := string(*a.Doc.Buffer)[s.StartByte:s.EndByte]
-	fmt.Fprintf(a.Content, content)
+	if len(a.Doc.Sections) > 0 {
+		s := a.Doc.Sections[a.focusSection]
+		a.Content.Clear()
+		// TODO: Why cant I slice buffer??
+		content := string(*a.Doc.Buffer)[s.StartByte:s.EndByte]
+		fmt.Fprintf(a.Content, content)
+	}
 }
 
 func (a *App) SetStatusbar() {
 	a.Statusbar.Clear()
-	fmt.Fprintf(a.Statusbar, fmt.Sprintf("  %s > %s > %s", a.Doc.Path, a.Doc.Title, a.Doc.Sections[a.focusSection].Title))
+	title := ""
+	if len(a.Doc.Sections) > 0 {
+		title = a.Doc.Sections[a.focusSection].Title
+	}
+	fmt.Fprintf(a.Statusbar, fmt.Sprintf("  %s > %s > %s", a.Doc.Path, a.Doc.Title, title))
 }
 
 func (a *App) SetSidebar() {
