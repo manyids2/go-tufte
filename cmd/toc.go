@@ -5,13 +5,13 @@ import (
 	"log"
 	"os"
 
-	"github.com/manyids2/go-tufte/core"
+	"github.com/manyids2/go-tufte/markdown"
 	"github.com/spf13/cobra"
 )
 
 // Print table of contents to stdout
 func PrintToC(path string) {
-	doc, err := core.NewDocument(path)
+	doc, err := markdown.NewDocument(path)
 	if err != nil {
 		fmt.Println("go-tufte:", err)
 		os.Exit(1)

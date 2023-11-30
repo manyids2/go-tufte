@@ -14,6 +14,7 @@ type BaseElement struct {
 	Style  StylePrimitive
 }
 
+// Get tcell.Style with BackgroundColor, Foreground, Bold, ...
 func GetStyle(rules StylePrimitive) tcell.Style {
 	style := tcell.StyleDefault
 	if rules.Color != nil {
@@ -46,7 +47,8 @@ func GetStyle(rules StylePrimitive) tcell.Style {
 	return style
 }
 
-func GetDecoration(rules StylePrimitive, s string) string {
+// Decorate string with prefix, suffix, case, ...
+func DecorateString(rules StylePrimitive, s string) string {
 	if rules.Upper != nil && *rules.Upper {
 		s = strings.ToUpper(s)
 	}

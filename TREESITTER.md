@@ -170,18 +170,18 @@ sed 's/^-    /  -/' >> TREESITTER.md
 
 Types of content
 
-- General content ⋯                                                                                                                                           
-- Document ⋯                                                                                                                                                  
-- Styles ⋯                                                                                                                                                    
-- Headings ⋯                                                                                                                                                  
-- Paragraph ⋯                                                                                                                                                 
-- Epigraph ⋯                                                                                                                                                  
-- Code ⋯                                                                                                                                                      
-- Links ⋯                                                                                                                                                     
-- Lists ⋯                                                                                                                                                     
-- Table ⋯                                                                                                                                                     
-- HTML ⋯                                                                                                                                                      
-- Images ⋯       
+- General content ⋯
+- Document ⋯
+- Styles ⋯
+- Headings ⋯
+- Paragraph ⋯
+- Epigraph ⋯
+- Code ⋯
+- Links ⋯
+- Lists ⋯
+- Table ⋯
+- HTML ⋯
+- Images ⋯
 
 #### General content
 
@@ -427,3 +427,127 @@ Types of content
   - link_title
 - image_description
   - general_content
+
+## New markdown parser
+
+```
+- document
+  - minus_metadata
+  - plus_metadata
+  - section
+
+- general_content
+  - block_continuation
+  - block_quote
+  - fenced_code_block
+  - html_block
+  - indented_code_block
+  - link_reference_definition
+  - list
+  - paragraph
+  - pipe_table
+  - section
+  - setext_heading
+  - thematic_break
+
+- section
+  - atx_heading
+  - general_content
+
+- setext_heading
+  - block_continuation
+  - setext_h1_underline
+  - setext_h2_underline
+- atx_heading
+  - atx_h1_marker
+  - atx_h2_marker
+  - atx_h3_marker
+  - atx_h4_marker
+  - atx_h5_marker
+  - atx_h6_marker
+  - block_continuation
+
+- inline
+  - block_continuation
+- paragraph
+  - block_continuation
+  - inline
+
+- thematic_break
+  - block_continuation
+
+- block_quote
+  - block_quote_marker
+  - general_content
+
+- code_fence_content
+  - block_continuation
+- fenced_code_block
+  - block_continuation
+  - code_fence_content
+  - fenced_code_block_delimiter
+  - info_string
+- indented_code_block
+  - block_continuation
+- info_string
+  - backslash_escape
+  - entity_reference
+  - language
+  - numeric_character_reference
+
+- language
+  - backslash_escape
+  - entity_reference
+  - numeric_character_reference
+
+- html_block
+  - block_continuation
+
+- link_destination
+  - backslash_escape
+  - entity_reference
+  - numeric_character_reference
+- link_label
+  - backslash_escape
+  - block_continuation
+  - entity_reference
+  - numeric_character_reference
+- link_reference_definition
+  - block_continuation
+  - link_destination
+  - link_label
+  - link_title
+- link_title
+  - backslash_escape
+  - block_continuation
+  - entity_reference
+  - numeric_character_reference
+
+- list
+  - list_item
+- list_item
+  - list_marker_dot
+  - list_marker_minus
+  - list_marker_parenthesis
+  - list_marker_plus
+  - list_marker_star
+  - task_list_marker_checked
+  - task_list_marker_unchecked
+  - general_content
+
+- pipe_table
+  - block_continuation
+  - pipe_table_delimiter_row
+  - pipe_table_header
+  - pipe_table_row
+- pipe_table_delimiter_cell
+  - pipe_table_align_left
+  - pipe_table_align_right
+- pipe_table_delimiter_row
+  - pipe_table_delimiter_cell
+- pipe_table_header
+  - pipe_table_cell
+- pipe_table_row
+  - pipe_table_cell
+```
+

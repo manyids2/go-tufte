@@ -1,4 +1,4 @@
-package core
+package markdown
 
 import (
 	"context"
@@ -38,7 +38,7 @@ func NewDocument(path string) (*Document, error) {
 	}
 
 	// Read file, return if invalid
-	content, err := os.ReadFile(path)
+	content, err := os.ReadFile(doc.Path)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +140,8 @@ func (d *Document) SetSections() {
 	// Allocates new list each time it is called
 	sections := make([]*Section, 0, n.ChildCount())
 
-	// Only direct children, not walking
+	// NOTE: Here is where parsing breaks down
+	// We need to walk to find all the sections
 	for i := 0; i < int(n.ChildCount()); i++ {
 		if n.Child(i).Type() == "atx_heading" {
 			section := d.NewSection(n.Child(i))

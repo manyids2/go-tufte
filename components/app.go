@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/gdamore/tcell/v2"
-	"github.com/manyids2/go-tufte/core"
+	"github.com/manyids2/go-tufte/markdown"
 	"github.com/rivo/tview"
 )
 
@@ -20,7 +20,7 @@ const (
 // View of app
 type App struct {
 	// Necessities
-	Doc         *core.Document
+	Doc         *markdown.Document
 	Application *tview.Application
 	Pages       *tview.Pages
 	Page        string
@@ -41,7 +41,7 @@ type App struct {
 	focusSection int
 }
 
-func NewApp(doc *core.Document) *App {
+func NewApp(doc *markdown.Document) *App {
 	app := App{
 		Doc:   doc,
 		Pages: tview.NewPages(),
