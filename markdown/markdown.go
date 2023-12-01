@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -51,26 +52,12 @@ func NewDocument(path string) (*Document, error) {
 	if err != nil {
 		return nil, err
 	}
-	n := tree.RootNode()
-
-	// TODO: approximating last row by last child of root
-	// fails if root has no children ( like empty file )
-	doc.Root = &Section{
-		Node:      n,
-		Level:     0,
-		StartByte: 0,
-		StartRow:  0,
-		EndByte:   uint32(len(content)),
-		EndRow:    0,
-	}
+	doc.Root = doc.NewSection(tree.RootNode())
 
 	// Return if new file
-	if n.ChildCount() == 0 {
+	if doc.Root.Node.ChildCount() == 0 {
 		return &doc, nil
 	}
-
-	// Else compute last row ( assumed finished before next step )
-	doc.Root.EndRow = n.Child(int(n.ChildCount()) - 1).EndPoint().Row
 
 	// Set sections
 	doc.SetSections()
@@ -79,8 +66,8 @@ func NewDocument(path string) (*Document, error) {
 	doc.SetRootFromSections()
 
 	// Set title to first found header
-	if len(doc.Root.Children) > 0 {
-		doc.Title = doc.Root.Children[0].Title
+	if len(doc.Sections) > 0 {
+		doc.Title = doc.Sections[0].Title
 	}
 
 	return &doc, nil
@@ -100,8 +87,9 @@ type Section struct {
 	// Byte boundaries for reading/writing
 	StartByte, EndByte uint32
 
-	// Row boundaries for display ('\n' is parsed already)
-	StartRow, EndRow uint32
+	// Boundaries for display ('\n' is parsed already)
+	StartRow, StartColumn uint32
+	EndRow, EndColumn     uint32
 
 	// Parent section
 	Parent *Section
@@ -115,51 +103,51 @@ type Section struct {
 
 func (d *Document) NewSection(n *sitter.Node) *Section {
 	// Parse level
-	level, err := strconv.Atoi(n.Child(0).Type()[5:6]) // Header type (1/2/3/... with hash)
+	level, err := strconv.Atoi(n.NamedChild(0).NamedChild(0).Type()[5:6]) // Header type (1/2/3/... with hash)
 	if err != nil {
 		level = 0 // Floating
 	}
 
 	// Parse title
-	title := n.Child(1).Child(0).Content(*d.Buffer)
+	title := n.NamedChild(0).NamedChild(1).Content(*d.Buffer)
 	title = strings.Trim(title, " ") // Necessary for headers
 
 	// Create new section
 	return &Section{
-		Node:      n,
-		Level:     level,
-		Title:     title,
-		StartRow:  n.StartPoint().Row,
-		StartByte: n.StartByte(),
+		Node:        n,
+		Level:       level,
+		Title:       title,
+		StartRow:    n.StartPoint().Row,
+		EndRow:      n.EndPoint().Row,
+		StartColumn: n.StartPoint().Column,
+		EndColumn:   n.EndPoint().Column,
+		StartByte:   n.StartByte(),
+		EndByte:     n.EndByte(),
 	}
 }
 
 func (d *Document) SetSections() {
-	n := d.Root.Node
-
 	// Allocates new list each time it is called
-	sections := make([]*Section, 0, n.ChildCount())
+	sections := []*Section{}
 
 	// NOTE: Here is where parsing breaks down
 	// We need to walk to find all the sections
-	for i := 0; i < int(n.ChildCount()); i++ {
-		if n.Child(i).Type() == "atx_heading" {
-			section := d.NewSection(n.Child(i))
+	WalkTSNode(d.Root.Node, func(n *sitter.Node) {
+		if n.Type() == "section" {
+			section := d.NewSection(n)
 			sections = append(sections, section)
 		}
-	}
+	})
 
+	// Error if nothing found
 	if len(sections) < 1 {
+		log.Fatal("No sections found")
 		return
+	} else {
+		fmt.Printf("%d sections found\n", len(sections))
 	}
 
-	// Reiterate to set end rows
-	for i := 0; i < len(sections)-1; i++ {
-		sections[i].EndRow = sections[i+1].StartRow - 1
-		sections[i].EndByte = sections[i+1].StartByte - 1
-	}
-	sections[len(sections)-1].EndRow = d.Root.EndRow
-	sections[len(sections)-1].EndByte = d.Root.EndByte
+	d.SetRootFromSections()
 
 	// Set on document
 	d.Sections = sections
@@ -180,6 +168,7 @@ func (d *Document) SetRootFromSections() {
 	// Variables to keep track
 	previous := d.Root
 	maxLevel := d.GetMaxLevel()
+
 	levelLatest := make([]*Section, maxLevel+1, maxLevel+1)
 	levelLatest[0] = d.Root
 
@@ -203,6 +192,15 @@ func (d *Document) SetRootFromSections() {
 		n.Parent.Children = append(n.Parent.Children, n)
 		levelLatest[n.Level] = n
 		previous = n
+	}
+}
+
+// WalkTSNode Walk tree-sitter node
+func WalkTSNode(n *sitter.Node, callback func(n *sitter.Node)) {
+	for i := 0; i < int(n.NamedChildCount()); i++ {
+		child := n.NamedChild(i)
+		callback(child)
+		WalkTSNode(child, callback)
 	}
 }
 

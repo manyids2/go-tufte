@@ -6,15 +6,15 @@ import (
 	"os"
 
 	"github.com/manyids2/go-tufte/components"
-	"github.com/manyids2/go-tufte/core"
+	"github.com/manyids2/go-tufte/markdown"
 	"github.com/spf13/cobra"
 )
 
 // tuiCmd represents the tui command
 var tuiCmd = &cobra.Command{
 	Use:   "tui",
-	Short: "Markdown viewer.",
-	Long:  `Markdown viewer`,
+	Short: "Interactive markdown viewer.",
+	Long:  `Interactive markdown viewer`,
 	Run: func(cmd *cobra.Command, args []string) {
 		path, err := cmd.Flags().GetString("path")
 		if err != nil {
@@ -22,7 +22,7 @@ var tuiCmd = &cobra.Command{
 		}
 
 		// Load document
-		doc, err := core.NewDocument(path)
+		doc, err := markdown.NewDocument(path)
 		if err != nil {
 			fmt.Println("go-tufte:", err)
 			os.Exit(1)

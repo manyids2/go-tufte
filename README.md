@@ -31,6 +31,9 @@ Basics of build script
   - `tree-sitter-markdown`
   - `tree-sitter-markdown-inline`
 
+  - lesser types of nodes
+
+
 ### Roadmap
 
 - [x] use go-tree-sitter for markdown
