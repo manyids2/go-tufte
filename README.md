@@ -4,22 +4,7 @@ Web and cli based markdown viewer and editor.
 
 ## Markdown specs
 
-- Metadata
-- Headers (`H1`, `H2`, `H3`, ...)
-
-- [Overview](https://dave.autonoma.ca/blog/2019/05/22/typesetting-markdown-part-1/)
-  Provided enough interest, the series will include the following parts:
-  - Build Script – create user-friendly shell scripts
-  - Tool Review – describe how the toolset works
-  - Automagicify – continuously integrate typesetting
-  - Theme Style – define colours, fonts, and layout
-  - Interpolation – define and use external variables
-  - Computation – leverage R for calculations
-  - Mathematics – beautifully typeset equations
-  - Annotations – apply different styles to annotated text
-  - Figures – draw figures using MetaPost
-
-Basics of build script
+[tree-sitter-markdown](TREESITTER.md)
 
 ## Treesitter + go + markdown
 
@@ -30,8 +15,8 @@ Basics of build script
   - !! `split_parser` branch
   - `tree-sitter-markdown`
   - `tree-sitter-markdown-inline`
-
-  - lesser types of nodes
+- Mainly done
+  - inline parsing still left
 
 
 ### Roadmap
@@ -39,10 +24,14 @@ Basics of build script
 - [x] use go-tree-sitter for markdown
 - [x] point at any md file
 - [x] print the usual hierarcy tree
-- [ ] print toc based on atx headers
-- [ ] create tui to test go-tree-sitter queries
+- [x] print toc based on atx headers
+- [ ] keep reference to sections
+- [ ] render tree based on node type ( block stack from glow? )
+- [ ] manage memory for rendered elements
+- [ ] folding
+- [ ] inline parsing
 
-## Table of contents
+## `toc` Table of contents
 
 - Prints following info about headers
 
@@ -54,8 +43,6 @@ Basics of build script
   - end byte
 
 - CONSTRAINT: Headers are only single line
-- [ ] Print toc with proper indent for sidebar
-- [ ] Make it take a io.Writer interface
 - [ ] Options for output format to json, yaml, md, etc.
 
 How to use awk to trim the output?
@@ -80,6 +67,21 @@ hi
  3 [6, 9] (25, 36)
 
 ```
+
+
+## `tui` Terminal interface
+
+Features:
+
+- [ ] Navigate by section
+- [ ] Styles
+- [ ] Presentation
+
+### Moving to tcell from tview?
+
+
+### Moving to nvim from go?
+
 
 ## Tufte
 
